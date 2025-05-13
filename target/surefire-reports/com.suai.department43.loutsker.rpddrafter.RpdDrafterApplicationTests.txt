@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.suai.department43.loutsker.rpddrafter.RpdDrafterApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 80.575 s - in com.suai.department43.loutsker.rpddrafter.RpdDrafterApplicationTests

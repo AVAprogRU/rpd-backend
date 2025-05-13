@@ -1,0 +1,70 @@
+version: '2'
+
+services:
+  drafter-app:
+    image: 'rloutsker/drafter-app:v2.0.6'
+    container_name: 'drafter-app'
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING.DATASOURCE.URL=jdbc:postgresql://drafter-db:5432/mydatabase
+      - SPRING.DATASOURCE.USER=myuser
+      - SPRING.DATASOURCE.PASSWORD=mypassword
+      - SERVER.PORT=8081
+      - APP.WEB-CLIENT.SERVER.URL=drafter-web
+      - APP.WEB-CLIENT.SERVER.PORT=:42724
+      - APP.ADMIN.NAME=admin
+      - APP.ADMIN.PASSWORD=admin
+      - JWT.EXPIRATION.TIME.MS=86400000
+      - JWT.SECRET=your_jwt_secret_key
+      - FILE-SYSTEM.RPD-TEMPLATE.PATH=/workspace/template.docx
+      - FILE-SYSTEM.TEACHER-INFO-FILE.PATH=/workspace/teachers.xlsx
+      - FILE-SYSTEM.TEMPORAL-FILE.PATH=/workspace/temp.tmp
+      - FILE-SYSTEM.TRANSLATION-MAP.PATH=/workspace/translations.json
+      - FILE-SYSTEM.SAMPLES-MAP.PATH=/workspace/samples.json
+      - SPRING.MAIL.HOST=smtp.gmail.com
+      - SPRING.MAIL.PORT=587
+      - SPRING.MAIL.USERNAME=vasyaalexeev2003@gmail.com
+      - SPRING.MAIL.PASSWORD=Gmailparol.0
+      - SPRING.MAIL.PROPERTIES.MAIL.SMTP.AUTH=true
+      - SPRING.MAIL.PROPERTIES.MAIL.SMTP.CONNECTIONTIMEOUT=5000
+      - SPRING.MAIL.PROPERTIES.MAIL.SMTP.TIMEOUT=5000
+      - SPRING.MAIL.PROPERTIES.MAIL.SMTP.WRITETIMEOUT=5000
+      - SPRING.MAIL.PROPERTIES.MAIL.SMTP.STARTTLS.ENABLE=true
+      - SPRINGDOC.API-DOCS.PATH=/api-docs
+    volumes:
+      - C:/drafter/workspace:/workspace
+    depends_on:
+      - drafter-db
+      - drafter-web
+    networks:
+      - drafter-network
+  drafter-web:
+    image: 'rloutsker/drafter-web:v2.0.6'
+    container_name: 'drafter-web'
+    ports:
+      - "42724:42724"
+    environment:
+      - SERVER_URL=drafter-app
+      - SERVER_PORT=:8081
+    networks:
+      - drafter-network
+  drafter-db:
+    image: postgres:12
+    container_name: 'drafter-db'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - C:/drafter/db-data:/var/lib/postgresql/data
+      - C:/drafter/db-init:/docker-entrypoint-initdb.d
+    networks:
+      - drafter-network
+volumes:
+  db-data:
+networks:
+  drafter-network:
+    driver: bridge
