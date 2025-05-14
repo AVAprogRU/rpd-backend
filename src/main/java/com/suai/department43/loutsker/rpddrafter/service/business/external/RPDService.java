@@ -424,6 +424,27 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
         }
     }
 
+    @Override
+    public RPDEntity getTemplateMergedTables(long selectedDisciplineId, long selectedRPDToImportId) {
+        try {
+            Discipline selectedDiscipline = provider.getDisciplineById(selectedDisciplineId).getBody();
+            RPDEntity rpdEntity = provider.getRPDById(selectedRPDToImportId);
+
+            List<String> templatePlaceholderNames = getTemplateInputPlaceholderNames();
+            // get list of placeholders from the rpd
+            Set<String> rpdPlaceholderNames = rpdEntity.getBody().getPlaceholders().keySet();
+            System.out.println("selectedDiscipline: " + objectMapper.writeValueAsString(jsonConverter.collectFields(selectedDiscipline)));
+            System.out.println("rpdEntity: " + objectMapper.writeValueAsString(rpdEntity.getBody()));
+            Set<String> autoFilledPlaceholdersMap = getSamples().keySet();
+            jsonConverter.mergeImport(rpdEntity.getBody(), selectedDiscipline,autoFilledPlaceholdersMap);
+
+            return rpdEntity;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Failed to merge RPD tables", ex);
+        }
+    }
+
     // Метод для логирования состояния таблиц
     private void logTablesState(String stageName, List<TableDataDTO> tables) {
         try {

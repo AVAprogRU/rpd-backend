@@ -1,5 +1,6 @@
 package com.suai.department43.loutsker.rpddrafter.service.business.internal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent.DisciplineEntity;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent.Teacher;
@@ -14,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class JsonConverter {
@@ -47,6 +46,49 @@ public class JsonConverter {
         rpd.setCompetences(discipline.getCompetences());
 
         rpd.setPlaceholders(collectFields(discipline));
+    }
+
+    public void mergeImport(RPD rpd, Discipline discipline, Set<String> autoFilledPlaceholdersMap) throws JsonProcessingException {
+        rpd.setFullEducationFormat(discipline.isFullTimeEducationFormat());
+        rpd.setEveningEducationFormat(discipline.isEveningEducationFormat());
+        rpd.setExtramuralEducationFormat(discipline.isExtramuralEducationFormat());
+
+        rpd.setMasterDegree(discipline.isMasterDegree());
+        rpd.setBachelorDegree(discipline.isBachelorDegree());
+        rpd.setSpecialistDegree(discipline.isSpecialistDegree());
+
+        rpd.setExamAttestationType(discipline.isExamAttestationType());
+        rpd.setTestAttestationType(discipline.isTestAttestationType());
+        rpd.setDiffTestAttestationType(discipline.isDiffTestAttestationType());
+
+        rpd.setHasCoursework(discipline.isHasCoursework());
+
+        rpd.setTotalTerm(discipline.getTermTotal());
+        rpd.setTerms(discipline.getTerms());
+        rpd.setCompetences(discipline.getCompetences());
+
+        HashMap<String, String> newPlaceholders = collectFields(discipline);
+        HashMap<String, String> oldPlaceholders = rpd.getPlaceholders();  // Предполагаем, что в RPD есть геттер
+
+        List<String> changedKeys = new ArrayList<>();
+
+        System.out.println("Old placeholders: " + mapper.writeValueAsString(oldPlaceholders));
+        System.out.println("New placeholders: " + mapper.writeValueAsString(newPlaceholders));
+
+        for (Map.Entry<String, String> entry : newPlaceholders.entrySet()) {
+            String key = entry.getKey();
+            String newValue = entry.getValue();
+            String oldValue = oldPlaceholders.get(key);
+
+            if (oldValue == null || !Objects.equals(oldValue, newValue)) {
+                oldPlaceholders.put(key, newValue);
+                changedKeys.add(key);
+                System.out.println("Updated key: " + key + ", New value: " + newValue);
+            }
+        }
+        System.out.println("Old placeholders: " + mapper.writeValueAsString(oldPlaceholders));
+        rpd.setPlaceholders(oldPlaceholders);  // Обновленные данные
+        rpd.getChangedFields().addAll(changedKeys);  // Сохраняем измененные ключи
     }
 
     public List<Discipline> extractDisciplineDTOsFromUMODTO(UMODTO umodto) {

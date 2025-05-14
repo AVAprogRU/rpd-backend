@@ -26,6 +26,7 @@ public class RPD implements Serializable {
     private boolean hasCoursework;
 
     private HashMap<String, String> placeholders = new HashMap<>();
+    private List<String> changedFields = new ArrayList<>();
     private List<TableDataDTO> tables = new ArrayList<>();
 
     private List<Competence> competences = new ArrayList<>();
@@ -121,6 +122,10 @@ public class RPD implements Serializable {
 
     public void setPlaceholders(HashMap<String, String> placeholders) {
         this.placeholders = placeholders;
+    }
+
+    public List<String> getChangedFields() {
+        return changedFields;
     }
 
     public List<TableDataDTO> getTables() {

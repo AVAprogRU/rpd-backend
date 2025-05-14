@@ -54,6 +54,13 @@ public class RPDController {
         return ResponseEntity.status(HttpStatus.OK).body(rpds);
     }
 
+    @GetMapping("/mergedtables")
+    public ResponseEntity<RPDEntity> getTemplateMergedTables(@RequestParam long selectedDisciplineId,
+                                                             @RequestParam long selectedRPDToImportId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getTemplateMergedTables(selectedDisciplineId,selectedRPDToImportId));
+    }
+
     @GetMapping("/crud/get")
     public ResponseEntity<RPDEntity> getRPDById(@RequestParam long id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getRPDById(id));
