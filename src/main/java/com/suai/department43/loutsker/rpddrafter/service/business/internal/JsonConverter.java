@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent.DisciplineEntity;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent.Teacher;
-import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.AchievementIndicator;
-import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.Discipline;
-import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.RPD;
-import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.Term;
+import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.*;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent.UniversityPosition;
 import com.suai.department43.loutsker.rpddrafter.domain.payload.*;
 import com.suai.department43.loutsker.rpddrafter.exception.business.DraftFailureException;
@@ -48,7 +45,7 @@ public class JsonConverter {
         rpd.setPlaceholders(collectFields(discipline));
     }
 
-    public void mergeImport(RPD rpd, Discipline discipline, Set<String> autoFilledPlaceholdersMap) throws JsonProcessingException {
+    public void mergeImport(RPD rpd, Discipline discipline) throws JsonProcessingException {
         rpd.setFullEducationFormat(discipline.isFullTimeEducationFormat());
         rpd.setEveningEducationFormat(discipline.isEveningEducationFormat());
         rpd.setExtramuralEducationFormat(discipline.isExtramuralEducationFormat());
@@ -65,6 +62,12 @@ public class JsonConverter {
 
         rpd.setTotalTerm(discipline.getTermTotal());
         rpd.setTerms(discipline.getTerms());
+        if (!areCompetenceListsEqual(rpd.getCompetences(),discipline.getCompetences())) {
+            System.out.println("⚠️ Компетенции отличаются — можно логировать, обрабатывать, подсвечивать и т.д.");
+            // здесь можно выполнять merge, лог, уведомление и т.д.
+        }
+
+        //вот тут в теории мы должны найти различие между компетенциями
         rpd.setCompetences(discipline.getCompetences());
 
         HashMap<String, String> newPlaceholders = collectFields(discipline);
@@ -72,8 +75,6 @@ public class JsonConverter {
 
         List<String> changedKeys = new ArrayList<>();
 
-        System.out.println("Old placeholders: " + mapper.writeValueAsString(oldPlaceholders));
-        System.out.println("New placeholders: " + mapper.writeValueAsString(newPlaceholders));
 
         for (Map.Entry<String, String> entry : newPlaceholders.entrySet()) {
             String key = entry.getKey();
@@ -86,7 +87,6 @@ public class JsonConverter {
                 System.out.println("Updated key: " + key + ", New value: " + newValue);
             }
         }
-        System.out.println("Old placeholders: " + mapper.writeValueAsString(oldPlaceholders));
         rpd.setPlaceholders(oldPlaceholders);  // Обновленные данные
         rpd.getChangedFields().addAll(changedKeys);  // Сохраняем измененные ключи
     }
@@ -210,5 +210,11 @@ public class JsonConverter {
             }
         }
         return result.toString();
+    }
+
+    private boolean areCompetenceListsEqual(List<Competence> list1, List<Competence> list2) {
+        if (list1 == null && list2 == null) return true;
+        if (list1 == null || list2 == null) return false;
+        return new HashSet<>(list1).equals(new HashSet<>(list2));
     }
 }

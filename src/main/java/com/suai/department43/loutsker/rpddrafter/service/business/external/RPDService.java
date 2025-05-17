@@ -393,29 +393,18 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
             // Инициализируем список для хранения состояния таблиц
             List<TableDataDTO> currentTables = new ArrayList<>();
 
-            // Логируем начальное состояние (должно быть пустым)
-            currentTables = drafter.getDocumentTablesData(templateCopy);
-            logTablesState("Initial state (before any filling)", currentTables);
-
             // 1. Заполняем таблицу интенсивности
             drafter.fillOutIntensityTable(templateCopy, drafter.getFirstDisciplineContentTableIndex() - 1, 3, rpd, drafter.getTranslationMap());
-            currentTables = drafter.getDocumentTablesData(templateCopy);
-            logTablesState("After fillOutIntensityTable", currentTables);
 
             // 2. Заполняем таблицу компетенций
             drafter.fillOutCompetencesTable(templateCopy, drafter.getFirstDisciplineContentTableIndex() - 2, drafter.getFontSize(), rpd);
-            currentTables = drafter.getDocumentTablesData(templateCopy);
-            logTablesState("After fillOutCompetencesTable", currentTables);
 
             // 3. Заполняем таблицу аттестации
             drafter.fillOutAttestationTable(templateCopy, drafter.getFirstAssessmentTableIndex(), rpd);
-            currentTables = drafter.getDocumentTablesData(templateCopy);
-            logTablesState("After fillOutAttestationTable", currentTables);
 
             // 4. Расширяем таблицу, зависящую от семестра
             drafter.expandTermDependentTable(templateCopy, drafter.getFirstDisciplineContentTableIndex() + 4, rpd);
             currentTables = drafter.getDocumentTablesData(templateCopy);
-            logTablesState("After expandTermDependentTable", currentTables);
 
             return currentTables;
         } catch (Exception ex) {
@@ -429,15 +418,10 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
         try {
             Discipline selectedDiscipline = provider.getDisciplineById(selectedDisciplineId).getBody();
             RPDEntity rpdEntity = provider.getRPDById(selectedRPDToImportId);
-
-            List<String> templatePlaceholderNames = getTemplateInputPlaceholderNames();
-            // get list of placeholders from the rpd
-            Set<String> rpdPlaceholderNames = rpdEntity.getBody().getPlaceholders().keySet();
-            System.out.println("selectedDiscipline: " + objectMapper.writeValueAsString(jsonConverter.collectFields(selectedDiscipline)));
+            List<TableDataDTO> tables = getRPDTablesForDiscipline(selectedDisciplineId);
+            rpdEntity.getBody().setTables(drafter.mergeTables(tables,rpdEntity.getBody().getTables()));
+            jsonConverter.mergeImport(rpdEntity.getBody(), selectedDiscipline);
             System.out.println("rpdEntity: " + objectMapper.writeValueAsString(rpdEntity.getBody()));
-            Set<String> autoFilledPlaceholdersMap = getSamples().keySet();
-            jsonConverter.mergeImport(rpdEntity.getBody(), selectedDiscipline,autoFilledPlaceholdersMap);
-
             return rpdEntity;
         } catch (Exception ex) {
             ex.printStackTrace();

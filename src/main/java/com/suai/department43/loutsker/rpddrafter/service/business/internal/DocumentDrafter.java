@@ -46,14 +46,30 @@ public class DocumentDrafter {
         expandTermDependentTable(documentToDraft, firstDisciplineContentTableIndex + 4, rpdToDraft);
         fillOutGenericTables(documentToDraft, firstDisciplineContentTableIndex);
         //
-        try {
+        /*try {
             FileOutputStream outStream = new FileOutputStream("C:/drafter/workspace/rpd-template.docx");
             documentToDraft.write(outStream);
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
+        }*/
         //
         return documentToDraft;
+    }
+
+    /**
+     * Эта функция берет все таблицы до firstDisciplineContentTableIndex из первого списка, а остальные из второго.
+     * Используется во время импорта, чтоб основные данные брались из УМО, а остальное из выбранной РПД
+    * @param
+    *
+    * */
+    public List<TableDataDTO> mergeTables(List<TableDataDTO> newTables, List<TableDataDTO> existingTables) {
+
+        List<TableDataDTO> merged = new ArrayList<>();
+
+        merged.addAll(newTables.subList(0, firstDisciplineContentTableIndex));
+        merged.addAll(existingTables.subList(firstDisciplineContentTableIndex, existingTables.size()));
+
+        return merged;
     }
 
     public void setupTables(TeacherInputDTO input, RPD rpd, XWPFDocument document) {
