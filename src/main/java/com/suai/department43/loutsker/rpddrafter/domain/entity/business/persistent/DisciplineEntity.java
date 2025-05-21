@@ -1,5 +1,6 @@
 package com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.Discipline;
 import com.vladmihalcea.hibernate.type.json.JsonType;
@@ -17,6 +18,10 @@ public class DisciplineEntity {
     @Column(columnDefinition = "json")
     @JsonIgnore
     private Discipline body;
+
+    @OneToOne(mappedBy = "discipline")
+    @JsonBackReference
+    private RPDEntity rpd;
 
     public DisciplineEntity() {
     }
@@ -47,5 +52,13 @@ public class DisciplineEntity {
 
     public void setBody(Discipline body) {
         this.body = body;
+    }
+
+    public RPDEntity getRpd() {
+        return rpd;
+    }
+
+    public void setRpd(RPDEntity rpd) {
+        this.rpd = rpd;
     }
 }

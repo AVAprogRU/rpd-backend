@@ -46,10 +46,10 @@ public class RPDController {
     }
 
     @GetMapping("/crud/find")
-    public ResponseEntity<List<RPDEntity>> getRPDByProperties(@RequestParam String disciplineName,
-                                                              @RequestParam String programCode,
-                                                              @RequestParam int enrollYear,
-                                                              @RequestParam String authorName) {
+    public ResponseEntity<List<RPDEntity>> getRPDByProperties(@RequestParam(required = false) String disciplineName,
+                                                              @RequestParam(required = false) String programCode,
+                                                              @RequestParam(required = false) Integer enrollYear,
+                                                              @RequestParam(required = false) String authorName) {
         List<RPDEntity> rpds = service.getRPDVersionsByProperties(disciplineName, programCode, enrollYear, authorName);
         return ResponseEntity.status(HttpStatus.OK).body(rpds);
     }
@@ -65,6 +65,13 @@ public class RPDController {
     public ResponseEntity<RPDEntity> getRPDById(@RequestParam long id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getRPDById(id));
     }
+
+    @GetMapping("/crud/getByDisciplineId")
+    public ResponseEntity<RPDEntity> getRPDByDisciplineIdOrNull(@RequestParam long disciplineId) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getByDisciplineIdOrNull(disciplineId));
+    }
+
+
 
     @DeleteMapping("/crud/delete")
     public void deleteRPDById(@RequestParam long id) {

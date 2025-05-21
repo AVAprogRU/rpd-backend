@@ -44,6 +44,7 @@ public class DBProvider {
         rpdRepository.save(rpd);
     }
 
+    // метод не используется, можно удалить
     public RPDEntity getRPDById(long id) {
         Optional<RPDEntity> rpdVersion = rpdRepository.findById(id);
         if (rpdVersion.isEmpty()) {
@@ -51,6 +52,11 @@ public class DBProvider {
         }
         return rpdVersion.get();
     }
+
+    public RPDEntity getByDisciplineIdOrNull(Long disciplineId) {
+        return rpdRepository.findByDiscipline_Id(disciplineId).orElse(null);
+    }
+
 
     public List<RPDEntity> getAllRPDs() {
         List<RPDEntity> rpds = rpdRepository.findAll();
@@ -60,17 +66,17 @@ public class DBProvider {
         return rpds;
     }
 
-    public List<RPDEntity> getRPDByProperties(String disciplineName, String programCode, int enrollYear, String authorName) {
-        if (!Objects.equals(disciplineName, "")) {
-            disciplineName = "";
+    public List<RPDEntity> getRPDByProperties(String disciplineName, String programCode, Integer enrollYear, String authorName) {
+        if (disciplineName != null && disciplineName.trim().isEmpty()) {
+            disciplineName = null;
         }
-        if (!Objects.equals(programCode, "")) {
-            programCode = "";
+        if (programCode != null && programCode.trim().isEmpty()) {
+            programCode = null;
         }
-        if (!Objects.equals(authorName, "")) {
-            authorName = "";
+        if (authorName != null && authorName.trim().isEmpty()) {
+            authorName = null;
         }
-        return rpdRepository.findByProperties(disciplineName, programCode, enrollYear, authorName);
+        return rpdRepository.search(disciplineName, programCode, enrollYear, authorName);
     }
 
     public void deleteRPDById(long id) {

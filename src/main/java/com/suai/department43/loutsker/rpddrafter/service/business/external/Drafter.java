@@ -12,9 +12,10 @@ public interface Drafter {
     FileDTO getDraftedDocument(long teacherId, long disciplineId, TeacherInputDTO input);
     FileDTO getReDraftedDocument(long teacherId, long rpdId, TeacherInputDTO input);
     RPDEntity getImportData(long rpdId);
-    List<RPDEntity> getRPDVersionsByProperties(String disciplineName, String programCode, int enrollYear, String authorName);
+    List<RPDEntity> getRPDVersionsByProperties(String disciplineName, String programCode, Integer enrollYear, String authorName);
     List<RPDEntity> getAllRPDs();
     RPDEntity getRPDById(long id);
+    RPDEntity getByDisciplineIdOrNull(long disciplineId);
     RPDEntity getTemplateMergedTables(long selectedDisciplineId, long selectedRPDToImportId);
     void deleteRPDById(long id);
 }

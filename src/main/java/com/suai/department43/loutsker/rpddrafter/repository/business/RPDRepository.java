@@ -7,12 +7,24 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RPDRepository extends JpaRepository<RPDEntity, Long> {
-    @Query("SELECT rpd FROM RPDEntity rpd WHERE " +
-            "rpd.authorName = :author OR rpd.enrollYear = :year OR " +
-            "rpd.programCode = :code OR rpd.disciplineName = :name")
-    List<RPDEntity> findByProperties(@Param("author") String authorName, @Param("code") String programCode,
-                                     @Param("year") int enrollYear,@Param("name") String disciplineName);
+
+    @Query("""
+    SELECT r FROM RPDEntity r
+    WHERE (:disciplineName IS NULL OR r.disciplineName LIKE CONCAT('%', :disciplineName, '%'))
+           AND (:programCode IS NULL OR r.programCode LIKE CONCAT('%', :programCode, '%'))
+           AND (:enrollYear IS NULL OR r.enrollYear = :enrollYear)
+           AND (:authorName IS NULL OR r.authorName LIKE CONCAT('%', :authorName, '%'))
+    """)
+    List<RPDEntity> search(
+            @Param("disciplineName") String disciplineName,
+            @Param("programCode") String programCode,
+            @Param("enrollYear") Integer enrollYear,
+            @Param("authorName") String authorName
+    );
+
+    Optional<RPDEntity> findByDiscipline_Id(Long disciplineId);
 }

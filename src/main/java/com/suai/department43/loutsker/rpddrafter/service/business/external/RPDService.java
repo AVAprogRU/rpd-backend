@@ -150,6 +150,7 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
             XWPFDocument templateCopy = new XWPFDocument(templateDocument.getPackage());
             XWPFDocument draftedDocument = drafter.draftDocument(templateCopy);
             String binaryString = fileHelper.convertToBase64(draftedDocument);
+            provider.saveRPD(rpdEntity);
 
             return new FileDTO(binaryString);
         } catch (Exception ex) {
@@ -177,6 +178,7 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
         // rpd persistence
         RPDEntity rpdVersion = new RPDEntity();
         rpdVersion.setBody(rpd);
+        rpdVersion.setDiscipline(disciplineEntity);
         addTitlePageProperties(rpdVersion, teacher, discipline);
         // rpd document draft
         try {
@@ -196,7 +198,7 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
     }
 
     @Override
-    public List<RPDEntity> getRPDVersionsByProperties(String disciplineName, String programCode, int enrollYear, String authorName) {
+    public List<RPDEntity> getRPDVersionsByProperties(String disciplineName, String programCode, Integer enrollYear, String authorName) {
         return provider.getRPDByProperties(disciplineName, programCode, enrollYear, authorName);
     }
 
@@ -207,6 +209,12 @@ public class RPDService implements Initializer, DepartmentManager, Drafter, Tech
 
     @Override
     public RPDEntity getRPDById(long id) {return provider.getRPDById(id);}
+
+    @Override
+    public RPDEntity getByDisciplineIdOrNull(long disciplineId) {
+        return provider.getByDisciplineIdOrNull(disciplineId);
+    }
+
 
     @Override
     public void deleteRPDById(long id) {provider.deleteRPDById(id);}

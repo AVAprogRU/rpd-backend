@@ -1,5 +1,6 @@
 package com.suai.department43.loutsker.rpddrafter.domain.entity.business.persistent;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.suai.department43.loutsker.rpddrafter.domain.entity.business.runtime.RPD;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -13,12 +14,17 @@ public class RPDEntity {
     private long id;
     private String authorName;
     private String authorPosition;
-    private String disciplineName;
+    private String disciplineName;   // по идее это поле не нужно, так как его можно вынуть из сущности дисциплины теперь
     private int enrollYear;
     private String programCode;
     @Type(JsonType.class)
     @Column(columnDefinition = "json")
     private RPD body;
+
+    @OneToOne
+    @JoinColumn(name = "discipline_id", referencedColumnName = "id")
+    @JsonManagedReference
+    private DisciplineEntity discipline;
 
     public RPDEntity() {
     }
@@ -77,5 +83,13 @@ public class RPDEntity {
 
     public void setEnrollYear(int enrollYear) {
         this.enrollYear = enrollYear;
+    }
+
+    public DisciplineEntity getDiscipline() {
+        return discipline;
+    }
+
+    public void setDiscipline(DisciplineEntity discipline) {
+        this.discipline = discipline;
     }
 }

@@ -57,17 +57,22 @@ public class DocumentDrafter {
     }
 
     /**
-     * Эта функция берет все таблицы до firstDisciplineContentTableIndex из первого списка, а остальные из второго.
+     * Эта функция берет все таблицы до firstDisciplineContentTableIndex и таблицу 13-14 из первого списка, а остальные из второго.
      * Используется во время импорта, чтоб основные данные брались из УМО, а остальное из выбранной РПД
+     * (Таблица 13 – Состав оценочных средств для проведения промежуточной аттестации)
+     * (Таблица 14 –Критерии оценки уровня сформированности компетенций (вся инфа о ней берется из шаблона рпд))
     * @param
     *
     * */
     public List<TableDataDTO> mergeTables(List<TableDataDTO> newTables, List<TableDataDTO> existingTables) {
 
         List<TableDataDTO> merged = new ArrayList<>();
+        int inputTablesOffset = firstDisciplineContentTableIndex - 2;
 
         merged.addAll(newTables.subList(0, firstDisciplineContentTableIndex));
-        merged.addAll(existingTables.subList(firstDisciplineContentTableIndex, existingTables.size()));
+        merged.addAll(existingTables.subList(firstDisciplineContentTableIndex,firstAssessmentTableIndex - inputTablesOffset));
+        merged.addAll(newTables.subList(firstAssessmentTableIndex - inputTablesOffset, firstAssessmentTableIndex - inputTablesOffset + 2));
+        merged.addAll(existingTables.subList(firstAssessmentTableIndex - inputTablesOffset + 2, existingTables.size()));
 
         return merged;
     }
@@ -524,7 +529,7 @@ public class DocumentDrafter {
             table.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf(2000));
         }
         for (int j = 0; j < terms.size(); j++) {
-            String text = "Семестр" + terms.get(j).getNumber();
+            String text = "Семестр " + terms.get(j).getNumber();
             fillTableCell(table, 0, j + 2, text, fontSize,
                     TableWidthType.AUTO, ParagraphAlignment.CENTER, FirstLineIndent.ZERO);
         }
